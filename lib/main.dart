@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_vpn/utils/my_colors.dart';
 import 'package:flutter_vpn/utils/my_strings.dart';
 import 'package:svg_flutter/svg.dart';
@@ -8,9 +7,14 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -30,8 +34,30 @@ enum UploadDownloadEnum { download, upload }
 
 enum SpeedTypeEnum { mb, kb }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  late AnimationController _switchSlideController;
+  late Animation<Offset> _switchAnimation;
+  @override
+  void initState() {
+    _switchSlideController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _switchAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.0, -0.6),
+    ).animate(_switchSlideController);
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +69,7 @@ class HomePage extends StatelessWidget {
             children: [
               Container(
                 margin: const EdgeInsets.only(top: 20),
-                child: SvgPicture.asset("assets/images/earth.svg"),
+                child: Image.asset("assets/images/earth.png"),
               ),
               Container(
                 margin: const EdgeInsets.only(top: 60),
@@ -54,9 +80,7 @@ class HomePage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          child: SvgPicture.asset("assets/icons/menu.svg"),
-                        ),
+                        SvgPicture.asset("assets/icons/menu.svg"),
                         Container(
                           height: 40,
                           decoration: BoxDecoration(
@@ -96,23 +120,21 @@ class HomePage extends StatelessWidget {
                             fontWeight: FontWeight.w700),
                       ),
                     ),
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            child: _buildUploadDownloadSpeed("124.1",
-                                SpeedTypeEnum.mb, UploadDownloadEnum.download),
-                          ),
-                          const SizedBox(
-                            width: 40,
-                          ),
-                          Container(
-                            child: _buildUploadDownloadSpeed("236.4",
-                                SpeedTypeEnum.kb, UploadDownloadEnum.upload),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: _buildUploadDownloadSpeed("124.1",
+                              SpeedTypeEnum.mb, UploadDownloadEnum.download),
+                        ),
+                        const SizedBox(
+                          width: 40,
+                        ),
+                        Container(
+                          child: _buildUploadDownloadSpeed("236.4",
+                              SpeedTypeEnum.kb, UploadDownloadEnum.upload),
+                        ),
+                      ],
                     )
                   ],
                 ),
@@ -147,58 +169,71 @@ class HomePage extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  width: 108,
-                  height: 158,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      transform: GradientRotation(9.87),
-                      stops: [0.1, 1],
-                      colors: [
-                        Color.fromRGBO(178, 181, 54, 1),
-                        Color.fromRGBO(126, 177, 88, 1),
-                      ],
-                    ),
-                  ),
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 40),
-                    child: Column(
-                      children: [
-                        const Text(
-                          MyStrings.stop,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14),
+                SlideTransition(
+                  position: _switchAnimation,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_switchAnimation.value ==
+                          Offset.zero) {
+                        _switchSlideController.forward();
+                      } else {
+                        _switchSlideController.reverse();
+                      }
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      width: 108,
+                      height: 158,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          transform: GradientRotation(9.87),
+                          stops: [0.1, 1],
+                          colors: [
+                            Color.fromRGBO(178, 181, 54, 1),
+                            Color.fromRGBO(126, 177, 88, 1),
+                          ],
                         ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 16),
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              stops: const [0, 1],
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.88),
-                                Colors.grey
-                              ],
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 40),
+                        child: Column(
+                          children: [
+                            const Text(
+                              MyStrings.stop,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14),
                             ),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.power_settings_new_outlined,
-                              color: Colors.white.withOpacity(0.6),
-                              size: 40,
-                            ),
-                          ),
-                        )
-                      ],
+                            Container(
+                              margin: const EdgeInsets.only(top: 16),
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  stops: const [0, 1],
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withOpacity(0.88),
+                                    Colors.grey
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.power_settings_new_outlined,
+                                  color: Colors.white.withOpacity(0.6),
+                                  size: 40,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
