@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_vpn/widgets/country_item.dart';
 import 'package:svg_flutter/svg.dart';
+import '../model/country_model.dart';
 import '../utils/my_colors.dart';
 import '../utils/my_strings.dart';
 import '../widgets/custom_btn.dart';
@@ -19,6 +20,25 @@ class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _switchSlideController;
   late Animation<Offset> _switchAnimation;
+  final List<CountryModel> countryList = [
+    CountryModel(
+        countryName: "USA",
+        countryImage: "assets/images/usa.png",
+        countryIp: "420.115.40.80"),
+    CountryModel(
+        countryName: "France",
+        countryImage: "assets/images/france.png",
+        countryIp: "356.803.24.46"),
+    CountryModel(
+        countryName: "Spanish",
+        countryImage: "assets/images/spanish.png",
+        countryIp: "401.506.65.72"),
+    CountryModel(
+        countryName: "Italian",
+        countryImage: "assets/images/italien.png",
+        countryIp: "416.412.80.56"),
+  ];
+
   @override
   void initState() {
     _switchSlideController = AnimationController(
@@ -169,14 +189,57 @@ class _MainPageState extends State<MainPage>
                   child: _buildToggleBtn(),
                 ),
                 const Spacer(),
-                buildCustomBtnWidget(
-                  "Canada",
-                  "assets/icons/canada.svg",
-                  true,
-                  () {
-                    print("show valable country list");
-                  },
-                ),
+                buildCustomBtnWidget("Canada", "assets/icons/canada.svg", true,
+                    () {
+                  showModalBottomSheet(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(26),
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      backgroundColor: MyColors.darkBackground,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          color: MyColors.darkBackground,
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 12),
+                                child: const Icon(
+                                  Icons.keyboard_arrow_up_sharp,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  margin:
+                                      const EdgeInsets.only(top: 14, left: 16),
+                                  child: ListView.separated(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: countryList.length,
+                                    itemBuilder: (context, index) {
+                                      return buildCountryItem(
+                                          countryList[index]);
+                                    },
+                                    separatorBuilder:
+                                        (BuildContext context, int index) {
+                                      return const SizedBox(
+                                        height: 34,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      });
+                }),
                 SizedBox(
                   height: 22.h,
                 )

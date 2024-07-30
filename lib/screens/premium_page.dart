@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_vpn/cubit/app_cubit.dart';
 import 'package:flutter_vpn/utils/my_strings.dart';
 import 'package:flutter_vpn/widgets/app_bar_widget.dart';
 import 'package:flutter_vpn/widgets/custom_btn.dart';
+import 'package:flutter_vpn/widgets/speed_chart.dart';
 
 class PremiumPage extends StatelessWidget {
   const PremiumPage({super.key});
@@ -21,9 +25,14 @@ class PremiumPage extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Image.asset("assets/images/earth.png"),
+              Container(
+                padding: EdgeInsets.only(top: 20.h),
+                width: 667.w,
+                height: 365.h,
+                child: Image.asset(
+                  "assets/images/earth.png",
+                  fit: BoxFit.cover,
+                ),
               ),
               Container(
                 margin: const EdgeInsets.only(top: 45),
@@ -43,13 +52,13 @@ class PremiumPage extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      margin:
-                          const EdgeInsets.only(top: 42, left: 26, right: 26),
+                      margin: EdgeInsets.only(top: 42.h),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildServiceOptionsWidget("Free", vpnFreeList),
+                          SizedBox(width: 26.w),
                           _buildServiceOptionsWidget("Premium", vpnPremiumList),
                         ],
                       ),
@@ -59,32 +68,41 @@ class PremiumPage extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 12, left: 20),
-                  child: Text(
-                    "\$8/mo",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF9FFF57),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: buildCustomBtnWidget(
-                    "Get started today",
-                    "",
-                    false,
-                    () {},
-                  ),
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: BlocBuilder<AppCubit, AppState>(
+              builder: (context, state) {
+                return const SpeedChartWidget( initValue: 100);
+              },
             ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 20.h, left: 20),
+                child: const Text(
+                  "\$8/mo",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF9FFF57),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: buildCustomBtnWidget(
+                  "Get started today",
+                  "",
+                  false,
+                  () {},
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 20.h,
           )
         ],
       ),
@@ -94,7 +112,7 @@ class PremiumPage extends StatelessWidget {
   Container _buildServiceOptionsWidget(String title, List<String> itemList) {
     int itemLength = itemList.length;
     return Container(
-      width: 175,
+      width: 175.w,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
@@ -124,7 +142,7 @@ class PremiumPage extends StatelessWidget {
 
   SizedBox _buildItemPointsWidget(List<String> itemList, double listHeight) {
     return SizedBox(
-      height: listHeight,
+      height: listHeight.h,
       child: ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.only(top: 0),
