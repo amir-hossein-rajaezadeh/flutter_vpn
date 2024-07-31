@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'package:animated_digit/animated_digit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vpn/cubit/app_cubit.dart';
@@ -20,7 +20,7 @@ class _SpeedTestPageState extends State<SpeedTestPage>
     with TickerProviderStateMixin {
   @override
   void initState() {
-    initFun();
+    context.read<AppCubit>().getSpeedValue();
     super.initState();
   }
 
@@ -55,24 +55,27 @@ class _SpeedTestPageState extends State<SpeedTestPage>
               Padding(
                   padding: const EdgeInsets.only(top: 80),
                   child: SpeedChartWidget(
-                    initValue: state.speedValue.toDouble(),
+                    initValue: state.chartValue,
                   )),
               Container(
                 margin: const EdgeInsets.only(bottom: 50),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      "60.3",
-                      style: TextStyle(
+                    // only show
+                    AnimatedDigitWidget(
+                      value: state.chartValue,
+                      fractionDigits: 1,
+                      textStyle: const TextStyle(
                           fontSize: 40,
                           color: Color(0xFF9FFF57),
                           fontWeight: FontWeight.w700,
                           height: 1),
                     ),
-                    Text(
+
+                    const Text(
                       "Mbs",
                       style: TextStyle(
                           color: Colors.grey,
@@ -137,11 +140,5 @@ class _SpeedTestPageState extends State<SpeedTestPage>
         ),
       ],
     );
-  }
-
-  Future<void> initFun() async {
-    context.read<AppCubit>().getSpeedValue();
-
-    Timer.periodic(const Duration(milliseconds: 1200), (timer) {});
   }
 }

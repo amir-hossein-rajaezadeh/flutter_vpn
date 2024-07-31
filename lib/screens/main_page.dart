@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vpn/widgets/country_item.dart';
 import 'package:svg_flutter/svg.dart';
@@ -20,6 +19,8 @@ class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _switchSlideController;
   late Animation<Offset> _switchAnimation;
+  late Animation<double> _startBtnAnimation;
+
   final List<CountryModel> countryList = [
     CountryModel(
         countryName: "USA",
@@ -51,11 +52,18 @@ class _MainPageState extends State<MainPage>
       end: const Offset(0.0, -0.6),
     ).animate(_switchSlideController);
 
+    _startBtnAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(_switchSlideController);
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("efeef${_startBtnAnimation.value}");
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
@@ -122,7 +130,7 @@ class _MainPageState extends State<MainPage>
                       child: const Text(
                         "CONNECTED",
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Color.fromRGBO(159, 255, 87, 1),
                         ),
@@ -186,7 +194,93 @@ class _MainPageState extends State<MainPage>
                       ),
                     ],
                   ),
-                  child: _buildToggleBtn(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 35.h),
+                        height: 48.h,
+                        width: 32,
+                        child: SvgPicture.asset(
+                          "assets/icons/arrow_up.svg",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SlideTransition(
+                        position: _switchAnimation,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_switchAnimation.value == Offset.zero) {
+                              _switchSlideController.forward();
+                            } else {
+                              _switchSlideController.reverse();
+                            }
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 8.h),
+                            width: 108,
+                            height: 158.h,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              gradient: const LinearGradient(
+                                begin: Alignment.topCenter,
+                                transform: GradientRotation(9.87),
+                                stops: [0.1, 1],
+                                colors: [
+                                  Color.fromRGBO(178, 181, 54, 1),
+                                  Color.fromRGBO(126, 177, 88, 1),
+                                ],
+                              ),
+                            ),
+                            child: Container(
+                              margin: EdgeInsets.only(top: 40.h),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    _switchSlideController.isCompleted
+                                        ? MyStrings.start
+                                        : MyStrings.stop,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14),
+                                  ),
+                                  FadeTransition(
+                                    opacity: _startBtnAnimation,
+                                    child: Container(
+                                      margin: EdgeInsets.only(top: 16.h),
+                                      width: 56,
+                                      height: 60.h,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          stops: const [0, 1],
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.black.withOpacity(0.88),
+                                            Colors.grey
+                                          ],
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                      ),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.power_settings_new_outlined,
+                                          color: Colors.white.withOpacity(0.6),
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const Spacer(),
                 buildCustomBtnWidget("Canada", "assets/icons/canada.svg", true,
@@ -251,85 +345,8 @@ class _MainPageState extends State<MainPage>
     );
   }
 
-  Column _buildToggleBtn() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          margin: EdgeInsets.only(top: 35.h),
-          height: 48.h,
-          width: 32,
-          child: SvgPicture.asset(
-            "assets/icons/arrow_up.svg",
-            fit: BoxFit.cover,
-          ),
-        ),
-        SlideTransition(
-          position: _switchAnimation,
-          child: GestureDetector(
-            onTap: () {
-              if (_switchAnimation.value == Offset.zero) {
-                _switchSlideController.forward();
-              } else {
-                _switchSlideController.reverse();
-              }
-            },
-            child: Container(
-              margin: EdgeInsets.only(bottom: 8.h),
-              width: 108,
-              height: 158.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  transform: GradientRotation(9.87),
-                  stops: [0.1, 1],
-                  colors: [
-                    Color.fromRGBO(178, 181, 54, 1),
-                    Color.fromRGBO(126, 177, 88, 1),
-                  ],
-                ),
-              ),
-              child: Container(
-                margin: EdgeInsets.only(top: 40.h),
-                child: Column(
-                  children: [
-                    const Text(
-                      MyStrings.stop,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 16.h),
-                      width: 56,
-                      height: 60.h,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          stops: const [0, 1],
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.black.withOpacity(0.88), Colors.grey],
-                        ),
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.power_settings_new_outlined,
-                          color: Colors.white.withOpacity(0.6),
-                          size: 40,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+  Widget _buildToggleBtn() {
+    return Container();
   }
 
   Widget _buildUploadDownloadSpeed(

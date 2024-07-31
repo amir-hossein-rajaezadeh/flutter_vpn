@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_vpn/cubit/app_cubit.dart';
 import 'package:flutter_vpn/utils/my_strings.dart';
 import 'package:flutter_vpn/widgets/app_bar_widget.dart';
 import 'package:flutter_vpn/widgets/custom_btn.dart';
@@ -68,13 +65,9 @@ class PremiumPage extends StatelessWidget {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: BlocBuilder<AppCubit, AppState>(
-              builder: (context, state) {
-                return const SpeedChartWidget( initValue: 100);
-              },
-            ),
+          const Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: SpeedChartWidget(initValue: 100),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

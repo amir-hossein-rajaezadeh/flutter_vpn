@@ -6,10 +6,9 @@ import 'package:svg_flutter/svg_flutter.dart';
 import '../cubit/app_cubit.dart';
 
 class SpeedChartWidget extends StatelessWidget {
-  const SpeedChartWidget(
-      {super.key,  required this.initValue});
+  const SpeedChartWidget({super.key, required this.initValue});
 
-   final double initValue;
+  final double initValue;
   @override
   Widget build(
     BuildContext context,
@@ -21,7 +20,7 @@ class SpeedChartWidget extends StatelessWidget {
           angle: -3,
           child: Center(
             child: Transform.rotate(
-              angle: percentage * (2.25 / 48),
+              angle: (percentage * (2.24 / 48)).toDouble(),
               child: SvgPicture.asset(
                 "assets/icons/location.svg",
               ),
@@ -31,7 +30,7 @@ class SpeedChartWidget extends StatelessWidget {
       },
       appearance: CircularSliderAppearance(
         animationEnabled: true,
-        animDurationMultiplier: 5.0,
+        animDurationMultiplier: 2.7,
         size: 220,
         customWidths: CustomSliderWidths(
           progressBarWidth: 16,
@@ -48,7 +47,7 @@ class SpeedChartWidget extends StatelessWidget {
       ),
       min: 0,
       max: 100,
-      initialValue: initValue,
+      initialValue: initValue.round().toDouble(),
     );
   }
 }

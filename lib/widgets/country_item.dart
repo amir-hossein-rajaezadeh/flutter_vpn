@@ -31,7 +31,7 @@ Widget buildCountryItem(CountryModel countryItem) {
                 ),
                 Text(
                   countryItem.countryIp,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       color: MyColors.grey,
                       fontSize: 12),
