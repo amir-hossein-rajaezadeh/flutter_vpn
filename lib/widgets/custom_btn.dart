@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:svg_flutter/svg.dart';
 
 Widget buildCustomBtnWidget(String title, String imageAddress,
     bool hasRightIcon, void Function() onTap) {
@@ -36,7 +35,7 @@ Widget buildCustomBtnWidget(String title, String imageAddress,
                     margin: const EdgeInsets.only(right: 8),
                     width: hasRightIcon ? 40 : 27,
                     height: hasRightIcon ? 40 : 27,
-                    child: SvgPicture.asset(
+                    child: Image.asset(
                       imageAddress,
                     ),
                   ),

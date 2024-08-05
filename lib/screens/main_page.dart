@@ -1,6 +1,12 @@
+import 'dart:async';
+import 'dart:math';
+import 'package:animated_digit/animated_digit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_vpn/cubit/app_cubit.dart';
 import 'package:flutter_vpn/widgets/country_item.dart';
+import 'package:intl/intl.dart';
 import 'package:svg_flutter/svg.dart';
 import '../model/country_model.dart';
 import '../utils/my_colors.dart';
@@ -19,9 +25,11 @@ class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _switchSlideController;
   late Animation<Offset> _switchAnimation;
-  late Animation<double> _startBtnAnimation;
-
   final List<CountryModel> countryList = [
+    CountryModel(
+        countryName: "Canada",
+        countryImage: "assets/images/canada.png",
+        countryIp: "420.115.40.80"),
     CountryModel(
         countryName: "USA",
         countryImage: "assets/images/usa.png",
@@ -31,39 +39,38 @@ class _MainPageState extends State<MainPage>
         countryImage: "assets/images/france.png",
         countryIp: "356.803.24.46"),
     CountryModel(
-        countryName: "Spanish",
+        countryName: "Spain",
         countryImage: "assets/images/spanish.png",
         countryIp: "401.506.65.72"),
     CountryModel(
-        countryName: "Italian",
+        countryName: "Italy",
         countryImage: "assets/images/italien.png",
         countryIp: "416.412.80.56"),
   ];
-
+  String currentTime = "";
   @override
   void initState() {
     _switchSlideController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-
     _switchAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0.0, -0.6),
     ).animate(_switchSlideController);
-
-    _startBtnAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(_switchSlideController);
-
+    Timer.periodic(
+      const Duration(seconds: 2),
+      (Timer t) {
+        setState(() {
+          currentTime = DateFormat('hh:mm').format(DateTime.now());
+        });
+      },
+    );
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("efeef${_startBtnAnimation.value}");
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
@@ -75,6 +82,26 @@ class _MainPageState extends State<MainPage>
                 height: 365.h,
                 child:
                     Image.asset("assets/images/earth.png", fit: BoxFit.cover),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        color: MyColors.lightGreen,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2, left: 2),
+                      child: Image.asset("assets/images/line.png"),
+                    ),
+                  ],
+                ),
               ),
               Container(
                 margin: EdgeInsets.only(top: 60.h),
@@ -112,66 +139,76 @@ class _MainPageState extends State<MainPage>
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 120.h),
-                child: Column(
-                  children: [
-                    const Center(
-                      child: Text(
-                        "02:15",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 80,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: const Text(
-                        "CONNECTED",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Color.fromRGBO(159, 255, 87, 1),
+              BlocBuilder<AppCubit, AppState>(builder: (context, state) {
+                return Padding(
+                  padding: EdgeInsets.only(top: 120.h),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Text(
+                          currentTime,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 80,
+                              fontWeight: FontWeight.w700),
                         ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 22.h),
-                      child: GestureDetector(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(
-                          builder: (context) {
-                            return const SpeedTestPage();
-                          },
-                        )),
-                        child: const Text(
-                          "Test Speed",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.yellow),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          state.vpnIsConnected ? "CONNECTED" : "DISCONNECTED",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color.fromRGBO(159, 255, 87, 1),
+                          ),
                         ),
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          child: _buildUploadDownloadSpeed(
-                              "124.1", "Mb/s", "download"),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 22.h),
+                        child: GestureDetector(
+                          onTap: () =>
+                              Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return const SpeedTestPage();
+                            },
+                          )),
+                          child: const Text(
+                            "Test Speed",
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.yellow),
+                          ),
                         ),
-                        const SizedBox(
-                          width: 40,
-                        ),
-                        Container(
-                          child: _buildUploadDownloadSpeed(
-                              "236.4", "Kb/s", "upload"),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              )
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            child: _buildUploadDownloadSpeed(
+                                (Random().nextInt(5)).toString(),
+                                "Mb/s",
+                                "download",
+                                state),
+                          ),
+                          const SizedBox(
+                            width: 40,
+                          ),
+                          Container(
+                            child: _buildUploadDownloadSpeed(
+                                (Random().nextInt(24) + 1100).toString(),
+                                "Kb/s",
+                                "upload",
+                                state),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              })
             ],
           ),
           Expanded(
@@ -206,84 +243,16 @@ class _MainPageState extends State<MainPage>
                           fit: BoxFit.cover,
                         ),
                       ),
-                      SlideTransition(
-                        position: _switchAnimation,
-                        child: GestureDetector(
-                          onTap: () {
-                            if (_switchAnimation.value == Offset.zero) {
-                              _switchSlideController.forward();
-                            } else {
-                              _switchSlideController.reverse();
-                            }
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 8.h),
-                            width: 108,
-                            height: 158.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              gradient: const LinearGradient(
-                                begin: Alignment.topCenter,
-                                transform: GradientRotation(9.87),
-                                stops: [0.1, 1],
-                                colors: [
-                                  Color.fromRGBO(178, 181, 54, 1),
-                                  Color.fromRGBO(126, 177, 88, 1),
-                                ],
-                              ),
-                            ),
-                            child: Container(
-                              margin: EdgeInsets.only(top: 40.h),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    _switchSlideController.isCompleted
-                                        ? MyStrings.start
-                                        : MyStrings.stop,
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
-                                  ),
-                                  FadeTransition(
-                                    opacity: _startBtnAnimation,
-                                    child: Container(
-                                      margin: EdgeInsets.only(top: 16.h),
-                                      width: 56,
-                                      height: 60.h,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          stops: const [0, 1],
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.black.withOpacity(0.88),
-                                            Colors.grey
-                                          ],
-                                        ),
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.power_settings_new_outlined,
-                                          color: Colors.white.withOpacity(0.6),
-                                          size: 40,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      BlocBuilder<AppCubit, AppState>(
+                        builder: (context, state) {
+                          return _buildToggleButton(context, state);
+                        },
+                      )
                     ],
                   ),
                 ),
                 const Spacer(),
-                buildCustomBtnWidget("Canada", "assets/icons/canada.svg", true,
+                buildCustomBtnWidget("Canada", "assets/images/canada.png", true,
                     () {
                   showModalBottomSheet(
                       shape: const RoundedRectangleBorder(
@@ -296,7 +265,7 @@ class _MainPageState extends State<MainPage>
                       context: context,
                       builder: (BuildContext context) {
                         return Container(
-                          height: MediaQuery.of(context).size.height * 0.4,
+                          height: MediaQuery.of(context).size.height * 0.42,
                           color: MyColors.darkBackground,
                           child: Column(
                             children: [
@@ -313,12 +282,12 @@ class _MainPageState extends State<MainPage>
                                   margin:
                                       const EdgeInsets.only(top: 14, left: 16),
                                   child: ListView.separated(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
+                                    physics: const BouncingScrollPhysics(),
                                     itemCount: countryList.length,
+                                    padding: const EdgeInsets.only(top: 0),
                                     itemBuilder: (context, index) {
                                       return buildCountryItem(
-                                          countryList[index]);
+                                          countryList[index], index);
                                     },
                                     separatorBuilder:
                                         (BuildContext context, int index) {
@@ -345,41 +314,114 @@ class _MainPageState extends State<MainPage>
     );
   }
 
-  Widget _buildToggleBtn() {
-    return Container();
+  Widget _buildToggleButton(BuildContext context, AppState state) {
+    return SlideTransition(
+      position: _switchAnimation,
+      child: GestureDetector(
+        onTap: () {
+          if (_switchAnimation.value == Offset.zero) {
+            _switchSlideController.forward();
+          } else {
+            _switchSlideController.reverse();
+          }
+          context.read<AppCubit>().connectVPN();
+        },
+        child: Container(
+          margin: EdgeInsets.only(bottom: 8.h),
+          width: 108,
+          height: 158.h,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              transform: GradientRotation(9.87),
+              stops: [0.1, 1],
+              colors: [
+                Color.fromRGBO(178, 181, 54, 1),
+                Color.fromRGBO(126, 177, 88, 1),
+              ],
+            ),
+          ),
+          child: Container(
+            margin: EdgeInsets.only(top: 40.h),
+            child: Column(
+              children: [
+                Text(
+                  state.vpnIsConnected ? MyStrings.stop : MyStrings.start,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: EdgeInsets.only(top: 12.h),
+                  width: 56,
+                  height: 60.h,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        stops: const [0, 1],
+                        end: Alignment.bottomCenter,
+                        colors: state.vpnIsConnected
+                            ? MyColors.connectedButtonColorList
+                            : MyColors.disConnectedButtonColorList),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.power_settings_new_outlined,
+                      color: Colors.white.withOpacity(0.6),
+                      size: 40,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildUploadDownloadSpeed(
-      String speed, String speedType, String status) {
+      String speed, String speedType, String status, AppState state) {
     return Row(
       children: [
         RotatedBox(
           quarterTurns: status == "download" ? 3 : 1,
           child: const Icon(
             Icons.arrow_back_ios_new_sharp,
-            size: 18,
+            size: 24,
             color: Colors.white,
           ),
         ),
         const SizedBox(
           width: 8,
         ),
-        Text.rich(
-          style: const TextStyle(
-              fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600),
-          TextSpan(
-            text: speed,
-            children: <InlineSpan>[
-              TextSpan(
-                text: speedType,
+        Row(
+          children: [
+            AnimatedDigitWidget(
+              value: state.vpnIsConnected ? double.parse(speed) : 0.0,
+              fractionDigits: 1,
+              duration: const Duration(milliseconds: 1300),
+              textStyle: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 2, left: 1),
+              child: Text(
+                speedType,
                 style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         )
       ],
     );

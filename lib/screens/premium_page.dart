@@ -22,8 +22,7 @@ class PremiumPage extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Container(
-                padding: EdgeInsets.only(top: 20.h),
+              SizedBox(
                 width: 667.w,
                 height: 365.h,
                 child: Image.asset(

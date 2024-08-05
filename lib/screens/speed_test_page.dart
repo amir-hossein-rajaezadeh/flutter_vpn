@@ -53,10 +53,11 @@ class _SpeedTestPageState extends State<SpeedTestPage>
                 ),
               ),
               Padding(
-                  padding: const EdgeInsets.only(top: 80),
-                  child: SpeedChartWidget(
-                    initValue: state.chartValue,
-                  )),
+                padding: const EdgeInsets.only(top: 80),
+                child: SpeedChartWidget(
+                  initValue: state.chartValue,
+                ),
+              ),
               Container(
                 margin: const EdgeInsets.only(bottom: 50),
                 child: Row(
@@ -64,7 +65,6 @@ class _SpeedTestPageState extends State<SpeedTestPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // only show
                     AnimatedDigitWidget(
                       value: state.chartValue,
                       fractionDigits: 1,
@@ -74,7 +74,6 @@ class _SpeedTestPageState extends State<SpeedTestPage>
                           fontWeight: FontWeight.w700,
                           height: 1),
                     ),
-
                     const Text(
                       "Mbs",
                       style: TextStyle(
@@ -96,7 +95,7 @@ class _SpeedTestPageState extends State<SpeedTestPage>
                 ),
               ),
               buildCustomBtnWidget(
-                  MyStrings.premium, "assets/icons/crown.svg", false, () {
+                  MyStrings.premium, "assets/icons/crown.png", false, () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(

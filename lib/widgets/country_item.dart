@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vpn/utils/my_colors.dart';
 import '../model/country_model.dart';
 
-Widget buildCountryItem(CountryModel countryItem) {
+Widget buildCountryItem(CountryModel countryItem, int index) {
   return Container(
+    alignment: Alignment.center,
     margin: const EdgeInsets.only(right: 26, left: 26),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -41,17 +42,19 @@ Widget buildCountryItem(CountryModel countryItem) {
           ],
         ),
         Container(
+          margin: EdgeInsets.only(right: index == 0 ? 0 : 6),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(124), color: MyColors.green),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+              borderRadius: BorderRadius.circular(124),
+              color: index == 0 ? MyColors.green : Colors.grey),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             child: Center(
               child: Text(
-                "Connected",
-                style: TextStyle(
+                index == 0 ? "Connected" : "Connect",
+                style: const TextStyle(
                     color: Colors.black,
                     fontSize: 15,
-                    fontWeight: FontWeight.w500),
+                    fontWeight: FontWeight.w600),
               ),
             ),
           ),
