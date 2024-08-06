@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:animated_digit/animated_digit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vpn/cubit/app_cubit.dart';
+import 'package:flutter_vpn/utils/speed_seprator.dart';
 import 'package:flutter_vpn/widgets/country_item.dart';
 import 'package:intl/intl.dart';
 import 'package:svg_flutter/svg.dart';
@@ -12,7 +12,6 @@ import '../model/country_model.dart';
 import '../utils/my_colors.dart';
 import '../utils/my_strings.dart';
 import '../widgets/custom_btn.dart';
-import 'speed_test_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -48,15 +47,22 @@ class _MainPageState extends State<MainPage>
         countryIp: "416.412.80.56"),
   ];
   String currentTime = "";
+
   @override
   void initState() {
+    context.read<AppCubit>().initStateFun();
+
     _switchSlideController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
     _switchAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0.0, -0.6),
+      begin: Offset(
+          0.0,
+          context.read<AppCubit>().v2rayStatus.value.state == "CONNECTED"
+              ? -0.6
+              : 0.0),
+      end: Offset(0.0, context.read<AppCubit>().vpnIsConnected() ? 0.0 : -0.6),
     ).animate(_switchSlideController);
     Timer.periodic(
       const Duration(seconds: 2),
@@ -66,7 +72,15 @@ class _MainPageState extends State<MainPage>
         });
       },
     );
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    context.read<AppCubit>().config.dispose();
+    context.read<AppCubit>().bypassSubnetController.dispose();
+    super.dispose();
   }
 
   @override
@@ -122,7 +136,10 @@ class _MainPageState extends State<MainPage>
                             padding: const EdgeInsets.only(right: 8, left: 8),
                             child: Row(
                               children: [
-                                SvgPicture.asset("assets/icons/crown.svg"),
+                                Image.asset(
+                                  "assets/icons/crown.png",
+                                  alignment: Alignment.center,
+                                ),
                                 const SizedBox(
                                   width: 12,
                                 ),
@@ -156,7 +173,7 @@ class _MainPageState extends State<MainPage>
                       Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         child: Text(
-                          state.vpnIsConnected ? "CONNECTED" : "DISCONNECTED",
+                          context.read<AppCubit>().v2rayStatus.value.state,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -168,11 +185,12 @@ class _MainPageState extends State<MainPage>
                         margin: EdgeInsets.only(bottom: 22.h),
                         child: GestureDetector(
                           onTap: () =>
-                              Navigator.push(context, MaterialPageRoute(
-                            builder: (context) {
-                              return const SpeedTestPage();
-                            },
-                          )),
+                              context.read<AppCubit>().importConfig(context),
+                          //   Navigator.push(context, MaterialPageRoute(
+                          // builder: (context) {
+                          //   return const SpeedTestPage();
+                          // },
+                          // )),
                           child: const Text(
                             "Test Speed",
                             style: TextStyle(
@@ -182,29 +200,33 @@ class _MainPageState extends State<MainPage>
                           ),
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            child: _buildUploadDownloadSpeed(
-                                (Random().nextInt(5)).toString(),
-                                "Mb/s",
-                                "download",
-                                state),
-                          ),
-                          const SizedBox(
-                            width: 40,
-                          ),
-                          Container(
-                            child: _buildUploadDownloadSpeed(
-                                (Random().nextInt(24) + 1100).toString(),
-                                "Kb/s",
-                                "upload",
-                                state),
-                          ),
-                        ],
-                      )
+                      ValueListenableBuilder(
+                          valueListenable: context.read<AppCubit>().v2rayStatus,
+                          builder: (context, value, child) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  child: _buildUploadDownloadSpeed(
+                                      vpnSpeed(value.downloadSpeed),
+                                      vpnType(value.downloadSpeed),
+                                      "download",
+                                      state),
+                                ),
+                                const SizedBox(
+                                  width: 40,
+                                ),
+                                Container(
+                                  child: _buildUploadDownloadSpeed(
+                                      vpnSpeed(value.uploadSpeed),
+                                      vpnType(value.uploadSpeed),
+                                      "upload",
+                                      state),
+                                ),
+                              ],
+                            );
+                          })
                     ],
                   ),
                 );
@@ -318,13 +340,23 @@ class _MainPageState extends State<MainPage>
     return SlideTransition(
       position: _switchAnimation,
       child: GestureDetector(
-        onTap: () {
-          if (_switchAnimation.value == Offset.zero) {
-            _switchSlideController.forward();
+        onTap: () async {
+          if (!context.read<AppCubit>().vpnIsConnected()) {
+            context.read<AppCubit>().connect(context);
+            if (!context.read<AppCubit>().vpnIsConnected()) {
+              await Future.delayed(const Duration(milliseconds: 600));
+              _switchSlideController.forward();
+            } else {
+              _switchSlideController.reverse();
+            }
           } else {
-            _switchSlideController.reverse();
+            context.read<AppCubit>().disConnect();
+            if (context.read<AppCubit>().vpnIsConnected()) {
+              _switchSlideController.reverse();
+            } else {
+              _switchSlideController.forward();
+            }
           }
-          context.read<AppCubit>().connectVPN();
         },
         child: Container(
           margin: EdgeInsets.only(bottom: 8.h),
@@ -347,7 +379,9 @@ class _MainPageState extends State<MainPage>
             child: Column(
               children: [
                 Text(
-                  state.vpnIsConnected ? MyStrings.stop : MyStrings.start,
+                  context.read<AppCubit>().vpnIsConnected()
+                      ? MyStrings.stop
+                      : MyStrings.start,
                   style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -363,7 +397,7 @@ class _MainPageState extends State<MainPage>
                         begin: Alignment.topCenter,
                         stops: const [0, 1],
                         end: Alignment.bottomCenter,
-                        colors: state.vpnIsConnected
+                        colors: context.read<AppCubit>().vpnIsConnected()
                             ? MyColors.connectedButtonColorList
                             : MyColors.disConnectedButtonColorList),
                     borderRadius: BorderRadius.circular(100),
@@ -402,7 +436,7 @@ class _MainPageState extends State<MainPage>
         Row(
           children: [
             AnimatedDigitWidget(
-              value: state.vpnIsConnected ? double.parse(speed) : 0.0,
+              value: double.parse(speed),
               fractionDigits: 1,
               duration: const Duration(milliseconds: 1300),
               textStyle: const TextStyle(
