@@ -135,6 +135,7 @@ class _MainPageState extends State<MainPage>
                           child: Padding(
                             padding: const EdgeInsets.only(right: 8, left: 8),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Image.asset(
                                   "assets/icons/crown.png",
@@ -283,12 +284,12 @@ class _MainPageState extends State<MainPage>
                         ),
                       ),
                       clipBehavior: Clip.antiAliasWithSaveLayer,
-                      backgroundColor: MyColors.darkBackground,
+                      backgroundColor: Colors.transparent,
                       context: context,
                       builder: (BuildContext context) {
                         return Container(
+                          color: MyColors.darkBackground.withOpacity(0.8),
                           height: MediaQuery.of(context).size.height * 0.42,
-                          color: MyColors.darkBackground,
                           child: Column(
                             children: [
                               Container(
