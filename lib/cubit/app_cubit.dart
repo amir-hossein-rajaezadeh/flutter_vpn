@@ -91,61 +91,22 @@ class AppCubit extends Cubit<AppState> {
 
   void importConfig(BuildContext context) async {
     if (await Clipboard.hasStrings()) {
-      try {
         
         final V2RayURL v2rayURL = FlutterV2ray.parseFromURL(
-            "vless://a05099a9-a33e-43b2-8082-4682b81e5d8f@poe.com:2095?security=none&type=ws&headerType=&path=speedtest.net%3Fed%3D512&host=fg66gh87t65erg76tgb76.greatmp.Ir#%F0%9F%87%B3%F0%9F%87%B1%20Netherland%20%28Hamrah%29");
+            "vless://a05099a9-a33e-43b2-8082-4682b81e5d8f@poe.com:2095?security=none&type=ws&headerType=&path=speedtest.net%3Fed%3D512&host=fg66gh87t65erg76tgb76.greatmp.Ir#%F0%9F%87%B3%F0%9F%87%B1%20Netherland%20%28Hamrah%29"
+            );
         remark = v2rayURL.remark;
         config.text = v2rayURL.getFullConfiguration();
 
-        // if (mounted) {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     const SnackBar(
-        //       content: Text(
-        //         'Success',
-        //       ),
-        //     ),
-        //   );
-        // }
-      } catch (error) {
-        // if (mounted) {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(
-        //       content: Text(
-        //         'Error: $error',
-        //       ),
-        //     ),
-        //   );
-        // }
       }
     }
-  }
-
-  void delay() async {
-    // final  int delay;
-    // if (v2rayStatus.value.state == 'CONNECTED') {
-    //   delay = await flutterV2ray.getConnectedServerDelay();
-    // } else {
-    //   delay = await flutterV2ray.getServerDelay(config: config.text);
-    // }
-    // if (!mounted) return;
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text(
-    //       '${delay}ms',
-    //     ),
-    //   ),
-    // );
-  }
-
+  
   void disConnect() {
     flutterV2ray.stopV2Ray();
   }
-
   void initStateFun() {
     flutterV2ray.initializeV2Ray().then((value) async {
       coreVersion = await flutterV2ray.getCoreVersion();
     });
-    print("init Done");
   }
 }
