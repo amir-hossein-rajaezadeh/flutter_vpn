@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vpn/cubit/app_cubit.dart';
+import 'package:flutter_vpn/screens/speed_test_page.dart';
 import 'package:flutter_vpn/utils/speed_seprator.dart';
 import 'package:flutter_vpn/widgets/country_item.dart';
 import 'package:intl/intl.dart';
@@ -186,12 +187,11 @@ class _MainPageState extends State<MainPage>
                         margin: EdgeInsets.only(bottom: 22.h),
                         child: GestureDetector(
                           onTap: () =>
-                              context.read<AppCubit>().importConfig(context),
-                          //   Navigator.push(context, MaterialPageRoute(
-                          // builder: (context) {
-                          //   return const SpeedTestPage();
-                          // },
-                          // )),
+                              Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return const SpeedTestPage();
+                            },
+                          )),
                           child: const Text(
                             "Test Speed",
                             style: TextStyle(

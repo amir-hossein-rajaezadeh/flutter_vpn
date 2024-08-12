@@ -70,6 +70,7 @@ class AppCubit extends Cubit<AppState> {
   }
 
   void connect(BuildContext context) async {
+    importConfig(context);
     if (await flutterV2ray.requestPermission()) {
       flutterV2ray.startV2Ray(
         remark: remark,
@@ -91,13 +92,12 @@ class AppCubit extends Cubit<AppState> {
   void importConfig(BuildContext context) async {
     if (await Clipboard.hasStrings()) {
       try {
-        final String link =
-            (await Clipboard.getData('text/plain'))?.text?.trim() ?? '';
-        final V2RayURL v2rayURL = FlutterV2ray.parseFromURL(link);
+        
+        final V2RayURL v2rayURL = FlutterV2ray.parseFromURL(
+            "vless://a05099a9-a33e-43b2-8082-4682b81e5d8f@poe.com:2095?security=none&type=ws&headerType=&path=speedtest.net%3Fed%3D512&host=fg66gh87t65erg76tgb76.greatmp.Ir#%F0%9F%87%B3%F0%9F%87%B1%20Netherland%20%28Hamrah%29");
         remark = v2rayURL.remark;
         config.text = v2rayURL.getFullConfiguration();
 
-        print("rrrrrr ${config.text}");
         // if (mounted) {
         //   ScaffoldMessenger.of(context).showSnackBar(
         //     const SnackBar(
